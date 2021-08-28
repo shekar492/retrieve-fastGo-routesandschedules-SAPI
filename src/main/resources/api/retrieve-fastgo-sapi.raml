@@ -1,0 +1,71 @@
+#%RAML 1.0
+title: retrieve-fastGo routesandschedules-SAPI
+
+uses:
+  common: /commonbusinesslibrary.raml
+types:
+  getroutesResponse: !include libraries/routes/datatypes/getRoutes200ResponsedataType.raml
+  getschedulesResponse: !include libraries/schedules/datatypes/getSchedules200ResponseexamplesdataType.raml
+  commonError: !include libraries/common/datatypes/commonErrordataType.raml
+/{transportType}:
+  /{transportCompany}:
+    /routes:
+      get:
+        is:
+          - common.transactionId
+        responses:
+            200:
+                body:
+                    application/json:
+                        type: getroutesResponse
+                        example: !include libraries/routes/examples/getroutes200responseexamplefile.json
+            400:
+              body:
+                application/json:
+                  type: commonError
+                  example: !include libraries/common/examples/error400messagefile.json
+            404:
+              body:
+                application/json:
+                  type: commonError
+                  example: !include libraries/common/examples/error404messagefile.json
+            500:
+              body:
+                application/json:
+                  type: commonError
+                  example: !include libraries/common/examples/error500messagefile.json
+    /schedules:
+      get:
+        is:
+          - common.transactionId
+          - common.departureLocationCode
+          - common.arrivalLocationCode
+        responses:
+          200:
+            body:
+              application/json:
+                type: getschedulesResponse
+                example: !include libraries/schedules/examples/getSchedules200ResponseExamplefile.json
+          400:
+            body:
+              application/json:
+                type: commonError
+                example: !include libraries/common/examples/error400messagefile.json
+          404:
+            body:
+              application/json:
+                type: commonError
+                example: !include libraries/common/examples/error404messagefile.json
+          500:
+            body:
+              application/json:
+                type: commonError
+                example: !include libraries/common/examples/error500messagefile.json
+                  
+              
+                                          
+                  
+                  
+                    
+                    
+                              

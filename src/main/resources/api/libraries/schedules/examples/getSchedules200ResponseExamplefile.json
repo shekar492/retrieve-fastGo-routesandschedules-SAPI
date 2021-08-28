@@ -1,0 +1,14 @@
+[
+  {
+    "departureDateTime": "2016-04-15T16:42:42",
+    "fromLocation": "klg-my",
+    "toLocation":"ben-sg",
+    "availableSeats":20 
+  },
+  {
+    "departureDateTime": "2019-04-15T16:42:42",
+    "fromLocation": "klg-my",
+    "toLocation":"ben-sg",
+    "availableSeats":30 
+  }
+]
