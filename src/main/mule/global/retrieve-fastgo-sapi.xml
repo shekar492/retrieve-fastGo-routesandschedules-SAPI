@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:apikit="http://www.mulesoft.org/schema/mule/mule-apikit" xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd http://www.mulesoft.org/schema/mule/mule-apikit http://www.mulesoft.org/schema/mule/mule-apikit/current/mule-apikit.xsd 
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+    
+    <flow name="retrieve-fastgo-sapi-main">
+        <http:listener path="/api/*" config-ref="retrieve-fastGo-sapi-httpListenerConfig">
+            <http:response statusCode="#[vars.httpStatus default 200]">
+                <http:headers><![CDATA[#[vars.outboundHeaders default {}]]]></http:headers>
+            </http:response>
+            <http:error-response statusCode="#[vars.httpStatus default 500]">
+                <http:body><![CDATA[#[payload]]]></http:body>
+                <http:headers><![CDATA[#[vars.outboundHeaders default {}]]]></http:headers>
+            </http:error-response>
+        </http:listener>
+       <apikit:router config-ref="retrieve-fastgo-sapi-config" />
+		<error-handler ref="globalError" />
+        
+        </flow>
+   
+    <flow name="retrieve-fastgo-sapi-console">
+        <http:listener path="/console/*" config-ref="retrieve-fastGo-sapi-httpListenerConfig">
+            <http:response statusCode="#[vars.httpStatus default 200]">
+                <http:headers><![CDATA[#[vars.outboundHeaders default {}]]]></http:headers>
+            </http:response>
+            <http:error-response statusCode="#[vars.httpStatus default 500]">
+                <http:body><![CDATA[#[payload]]]></http:body>
+                <http:headers><![CDATA[#[vars.outboundHeaders default {}]]]></http:headers>
+            </http:error-response>
+        </http:listener>
+        <apikit:console config-ref="retrieve-fastgo-sapi-config" />
+		<error-handler ref="globalError" />
+    </flow>
+    <sub-flow name="retrieve-fastgo-sapiSub_Flow" doc:id="8f91ba4a-0cbf-42af-a0e4-0e410b10a84d" >
+		<ee:transform xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core">
+            <ee:variables>
+                <ee:set-variable variableName="transportType"><![CDATA[attributes.uriParams.'transportType']]></ee:set-variable>
+                <ee:set-variable variableName="transportCompany"><![CDATA[attributes.uriParams.'transportCompany']]></ee:set-variable>
+				<ee:set-variable variableName="transactionId"><![CDATA[%dw 2.0
+output application/java
+---
+attributes.headers.transactionId]]></ee:set-variable>
+            </ee:variables>
+        </ee:transform>
+	</sub-flow>
+	<flow name="get:\(transportType)\(transportCompany)\routes:retrieve-fastgo-sapi-config">
+        <flow-ref doc:name="Flow Reference to call subflow" doc:id="c5507de2-8790-474f-bd8c-f50bbbdc0f96" name="retrieve-fastgo-sapiSub_Flow"/>
+		<logger level="INFO" doc:name="Logger" doc:id="3624c443-b392-4fc5-8228-cd0e08153ab1" message="request received from fastGo sapi #[vars.transactionId]"/>
+		<flow-ref doc:name="Flow Reference" doc:id="25d187bc-a980-402e-b520-d8bf0ca48bb2" name="fastGo-getRoutes-implementationSub_Flow"/>
+		<logger level="INFO" doc:name="Logger" doc:id="00b9bda0-e5e9-425b-8c3d-a0ae53227da5" message="response sent to fastGo getroutes sapi #[vars.transactionId]"/>
+    </flow>
+    <flow name="get:\(transportType)\(transportCompany)\schedules:retrieve-fastgo-sapi-config">
+        <flow-ref doc:name="Flow Reference to call subflow" doc:id="45fadc6a-1920-494d-8fb4-77168bbc21de" name="retrieve-fastgo-sapiSub_Flow"/>
+		<logger level="INFO" doc:name="Logger" doc:id="476f9712-de15-4808-ab2f-c015d845e520" message="request received from fastGo sapi #[vars.transactionId]"/>
+		<flow-ref doc:name="Flow Reference" doc:id="3789ffe4-c627-4381-a292-d4e68a4b6914" name="fastGo-getSchedules-implementationSub_Flow"/>
+		<logger level="INFO" doc:name="Logger" doc:id="55b9ea2c-3066-4767-b79c-52534e3ad129" message="response sent to fastGo getroutes sapi #[vars.transactionId]"/>
+    </flow>
+</mule>
